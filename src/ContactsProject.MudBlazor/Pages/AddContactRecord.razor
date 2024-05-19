@@ -1,0 +1,71 @@
+@page "/contacts/add"
+@inject AppService AppService
+@inject ISnackbar Snackbar
+@inject HttpClient HttpClient
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<PageTitle>Add Contact Record</PageTitle>
+
+<EditForm Model="@record" OnValidSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">Add Contact Record</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField @bind-Value="record.FirstName" For="@(() => record.FirstName)" Label="First Name" />
+            <MudTextField @bind-Value="record.LastName" For="@(() => record.LastName)" Label="Last Name" />
+            <MudTextField Format="s" InputType="InputType.DateTimeLocal" @bind-Value="record.Birthday" For="@(() => record.Birthday)" Label="Birthday" />
+            <MudTextField @bind-Value="record.Email" For="@(() => record.Email)" Label="Email" />
+            <MudTextField @bind-Value="record.PhoneNumber" For="@(() => record.PhoneNumber)" Label="Phone Number" />
+            <MudTextField @bind-Value="record.StreetAddress" For="@(() => record.StreetAddress)" Label="Street Address" />
+            <MudTextField @bind-Value="record.City" For="@(() => record.City)" Label="City" />
+            <MudTextField @bind-Value="record.State" For="@(() => record.State)" Label="State" />
+            <MudTextField @bind-Value="record.Zip" For="@(() => record.Zip)" Label="Zip" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="OnCancel">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Add</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance? MudDialog { get; set; }
+
+    private Contact record = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void OnCancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            await AppService.InsertContactAsync(record);
+            MudDialog?.Close();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

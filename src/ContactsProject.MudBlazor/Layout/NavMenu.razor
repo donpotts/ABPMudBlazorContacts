@@ -1,0 +1,97 @@
+<MudAppBar>
+    @if (!CheckedVariable)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    }
+    <MudText Class="d-flex mr-8">Contacts</MudText>
+    <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert="true">
+        <MudTooltip Text="@tooltipText">    
+            <MudSwitch T="bool" Class="d-flex justify-content-start " Value="CheckedVariable" ValueChanged="@(e => OnSwitchValueChanged((bool)e))" Color="Color.Secondary" UnCheckedColor="Color.Primary" />
+        </MudTooltip>
+    </MudHidden>
+    <MudSpacer />
+    <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert="true" IsHiddenChanged="ScreenSizeChanged">
+    @if (CheckedVariable)
+    {
+        <MudToolBar>
+            <MudLink Href="/" Class="d-flex px-4" Color="Color.Inherit">Home</MudLink>
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <MudLink Href="contacts" Class="d-flex px-3" Color="Color.Inherit">Contacts</MudLink>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <MudLink Href="contactusers" Class="d-flex px-3" Color="Color.Inherit">Users</MudLink>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudLink Href="logout" Class="d-flex px-3" Color="Color.Inherit">Logout</MudLink>
+                        </Authorized>
+                        <NotAuthorized>
+                            <MudLink Href="login" Class="d-flex px-3" Color="Color.Inherit">Login</MudLink>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+        </MudToolBar>
+    }
+    </MudHidden>
+    <MudLink Href="https://www.donpotts.com/" Color="Color.Inherit">About</MudLink>
+</MudAppBar>
+@if (!CheckedVariable)
+{
+    <MudDrawer @bind-Open="drawerOpen" ClipMode="DrawerClipMode.Docked">
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <MudNavLink Href="contacts" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person"> Contacts</MudNavLink>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <MudNavLink Href="contactusers" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.People"> Users</MudNavLink>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <MudNavLink Href="logout" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DoorBack"> Logout</MudNavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <MudNavLink Href="login" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DoorSliding"> Login</MudNavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+    </MudDrawer>
+}
+
+@code {
+    private bool drawerOpen = true;
+    private bool isSwitchChecked;
+    private bool CheckedVariable;
+    private string tooltipText => isSwitchChecked ? "Top Menu ON" : "Top Menu is OFF";
+
+    private void DrawerToggle()
+    {
+        drawerOpen = !drawerOpen;
+    }
+
+    public void ScreenSizeChanged(bool hidden)
+    {
+        if (hidden)
+            CheckedVariable = false;
+        else
+            CheckedVariable = isSwitchChecked;
+    }
+
+    public void OnSwitchValueChanged(bool checkedValue)
+    {
+        CheckedVariable = checkedValue;
+        if (checkedValue)
+            isSwitchChecked = true;
+        else
+            isSwitchChecked = false;
+    }
+}

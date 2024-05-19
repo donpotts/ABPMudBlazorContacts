@@ -1,0 +1,165 @@
+@page "/contacts"
+@implements IDisposable
+@inject AppService AppService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject HttpClient HttpClient
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<PageTitle>List Contacts</PageTitle>
+
+@if (records == null)
+{
+    @if (loadError == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <p class="text-danger">@loadError</p>
+    }
+}
+else
+{
+    <div class="mb-3">
+        <MudText Typo="Typo.h3">Contacts</MudText>
+    </div>
+
+    <MudStack AlignItems="AlignItems.End" Class="mb-3">
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Primary" OnClick="@(e => OnAdd())">Add</MudButton>
+    </MudStack>
+
+    <MudDataGrid T="Contact" @ref="grid" ServerData="(new Func<GridState<Contact>, Task<GridData<Contact>>>(ServerReload))" Filterable="true">
+        <Columns>
+            <PropertyColumn Property="x => x!.Id" Title="Id" />
+            <PropertyColumn Property="x => x!.FirstName" Title="First Name" />
+            <PropertyColumn Property="x => x!.LastName" Title="Last Name" />
+            <PropertyColumn Property="x => x!.Birthday" Title="Birth Day" />
+            <PropertyColumn Property="x => x!.Email" Title="Email" />
+            <PropertyColumn Property="x => x!.PhoneNumber" Title="Phone Number" />
+            <PropertyColumn Property="x => x!.StreetAddress" Title="Street Address" />
+            <PropertyColumn Property="x => x!.City" Title="City" />
+            <PropertyColumn Property="x => x!.State" Title="State" />
+            <PropertyColumn Property="x => x!.Zip" Title="Zip" />
+            <TemplateColumn StickyRight="true" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <MudStack Row="true">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="@Size.Small" Title="Edit" OnClick="@(e => OnEdit(context.Item!))" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="@Size.Small" Title="Delete" OnClick="@(e => OnDelete(context.Item!))" />
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Contact" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private MudDataGrid<Contact>? grid;
+    private string? loadError;
+
+    private Contact[] records;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += LocationChanged;
+
+        await LoadDataAsync();
+    }
+
+    void IDisposable.Dispose()
+    {
+        Navigation.LocationChanged -= LocationChanged;
+    }
+
+    private async void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        records = null;
+        StateHasChanged();
+
+        await LoadDataAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            PagedResultDto<Contact> res = await AppService.ListContactsAsync();
+            records = res.Items.ToArray();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task<GridData<Contact>> ServerReload(GridState<Contact> state)
+    {
+        var top = state.PageSize;
+        var skip = state.Page * state.PageSize;
+        var RecordCount = 0;
+        try
+        {
+            PagedResultDto<Contact> res = await AppService.ListContactsAsync();
+            records = res.Items.ToArray();
+            RecordCount = (int)res.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        return new() { TotalItems = RecordCount, Items = records?.ToList() ?? Enumerable.Empty<Contact>() };
+    }
+
+    private async void OnAdd()
+    {
+        DialogOptions dialogOptions = new() { FullWidth = true, CloseOnEscapeKey = true };
+
+        var result = await DialogService.Show<AddContactRecord>("Add Contact", dialogOptions).Result;
+
+        if (!result.Canceled)
+        {
+            await (grid?.ReloadServerData() ?? Task.CompletedTask);
+        }
+    }
+
+    private async void OnEdit(Contact record)
+    {
+        DialogParameters<UpdateContactRecord> dialogParams = new() { { x => x.Id, record.Id!.Value } };
+        DialogOptions dialogOptions = new() { FullWidth = true, CloseOnEscapeKey = true };
+
+        var result = await DialogService.Show<UpdateContactRecord>("Update Contact", dialogParams, dialogOptions).Result;
+
+        if (!result.Canceled)
+        {
+            await (grid?.ReloadServerData() ?? Task.CompletedTask);
+        }
+    }
+
+    private async void OnDelete(Contact record)
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Warning",
+            "Are you sure you want to delete this record?",
+            "Delete",
+            "Cancel");
+
+        if (result.GetValueOrDefault(false))
+        {
+            try
+            {
+                await AppService.DeleteContactAsync(record.Id!.Value);
+                await (grid?.ReloadServerData() ?? Task.CompletedTask);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, Severity.Error);
+            }
+        }
+    }
+}

@@ -1,0 +1,145 @@
+{
+  "Name": "ContactsProject",
+  "EntitySchemas": [
+    {
+      "Name": "Contact",
+      "Namespace": "ContactsProject.Contacts",
+      "Key": "Id",
+      "Properties": {
+        "Id": "int",
+        "FirstName": "string?",
+        "LastName": "string?",
+        "Birthday": "DateTime",
+        "PhoneNumber": "string?",
+        "Email": "string?",
+        "StreetAddress": "string?",
+        "City": "string?",
+        "State": "string?",
+        "Zip": "int"
+      },
+      "Data": [
+        {
+          "Id": 1,
+          "FirstName": "Lloyd",
+          "LastName": "Forte",
+          "Birthday": "1969-08-26T00:00:00",
+          "PhoneNumber": "544-9221",
+          "Email": "lforte@email.com",
+          "StreetAddress": "4727 Arron Smith Drive",
+          "City": "Honolulu",
+          "State": "HI",
+          "Zip": 96813
+        },
+        {
+          "Id": 2,
+          "FirstName": "Brenna",
+          "LastName": "Duran",
+          "Birthday": "1988-06-16T00:00:00",
+          "PhoneNumber": "291-6894",
+          "Email": "bduran@email.com",
+          "StreetAddress": "2886 Veltri Drive",
+          "City": "Mentasta",
+          "State": "AK",
+          "Zip": 99780
+        },
+        {
+          "Id": 3,
+          "FirstName": "Ramon",
+          "LastName": "Bell",
+          "Birthday": "1992-08-06T00:00:00",
+          "PhoneNumber": "452-1062",
+          "Email": "rbell@email.com",
+          "StreetAddress": "1101 Ford Street",
+          "City": "San Jose",
+          "State": "CA",
+          "Zip": 95131
+        },
+        {
+          "Id": 4,
+          "FirstName": "Leonard",
+          "LastName": "Mooney",
+          "Birthday": "1954-12-27T00:00:00",
+          "PhoneNumber": "361-1642",
+          "Email": "lmooney@email.com",
+          "StreetAddress": "4581 Lochmere Lane",
+          "City": "Norwalk",
+          "State": "CT",
+          "Zip": 6851
+        },
+        {
+          "Id": 5,
+          "FirstName": "Dominique",
+          "LastName": "Monaco",
+          "Birthday": "1977-11-26T00:00:00",
+          "PhoneNumber": "986-8317",
+          "Email": "dmonaco@email.com",
+          "StreetAddress": "2261 James Avenue",
+          "City": "Macedon",
+          "State": "NY",
+          "Zip": 14502
+        },
+        {
+          "Id": 6,
+          "FirstName": "Phillip",
+          "LastName": "White",
+          "Birthday": "1967-08-31T00:00:00",
+          "PhoneNumber": "241-5333",
+          "Email": "pwhite@email.com",
+          "StreetAddress": "4815 Green Gate Lane",
+          "City": "Baltimore",
+          "State": "MD",
+          "Zip": 21201
+        },
+        {
+          "Id": 7,
+          "FirstName": "Mollie",
+          "LastName": "Watts",
+          "Birthday": "1983-06-26T00:00:00",
+          "PhoneNumber": "681-8740",
+          "Email": "mwatts@email.com",
+          "StreetAddress": "4177 Friendship Lane",
+          "City": "San Martin",
+          "State": "CA",
+          "Zip": 95046
+        },
+        {
+          "Id": 8,
+          "FirstName": "Marissa",
+          "LastName": "Pangle",
+          "Birthday": "1981-10-16T00:00:00",
+          "PhoneNumber": "528-6349",
+          "Email": "mpangle@email.com",
+          "StreetAddress": "2615 Mudlick Road",
+          "City": "Millwood",
+          "State": "WA",
+          "Zip": 99212
+        },
+        {
+          "Id": 9,
+          "FirstName": "Robert",
+          "LastName": "Davis",
+          "Birthday": "1992-03-25T00:00:00",
+          "PhoneNumber": "523-0201",
+          "Email": "rdavis@email.com",
+          "StreetAddress": "2297 Young Road",
+          "City": "Idaho Falls",
+          "State": "ID",
+          "Zip": 83402
+        },
+        {
+          "Id": 10,
+          "FirstName": "Shawn",
+          "LastName": "Warwick",
+          "Birthday": "1967-02-07T00:00:00",
+          "PhoneNumber": "492-2600",
+          "Email": "swarwick@email.com",
+          "StreetAddress": "1859 Poe Lane",
+          "City": "Kansas City",
+          "State": "KS",
+          "Zip": 66215
+        }
+      ]
+    }
+  ],
+  "OpenIddictConsoleClient": true
+}

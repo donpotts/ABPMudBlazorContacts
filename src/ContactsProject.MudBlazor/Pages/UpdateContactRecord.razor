@@ -1,0 +1,96 @@
+@page "/contacts/{Id:long}"
+@inject AppService AppService
+@inject ISnackbar Snackbar
+@inject HttpClient HttpClient
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<PageTitle>Update Contact</PageTitle>
+
+@if (record == null)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">Update Contact</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudText>Loading...</MudText>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="OnCancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" Disabled="true">Update</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+else
+{
+    <EditForm Model="@record" OnValidSubmit="@OnSubmit">
+        <DataAnnotationsValidator />
+        <MudDialog>
+            <TitleContent>
+                <MudText Typo="Typo.h6">Update Contact</MudText>
+            </TitleContent>
+            <DialogContent>
+                <MudNumericField @bind-Value="@record.Id" For="@(() => @record.Id)" Label="Id" ReadOnly="true" />
+                <MudTextField @bind-Value="record.FirstName" For="@(() => record.FirstName)" Label="First Name" />
+                <MudTextField @bind-Value="record.LastName" For="@(() => record.LastName)" Label="Last Name" />
+                <MudTextField Format="s" InputType="InputType.DateTimeLocal" @bind-Value="record.Birthday" For="@(() => record.Birthday)" Label="Birthday" />
+                <MudTextField @bind-Value="record.Email" For="@(() => record.Email)" Label="Email" />
+                <MudTextField @bind-Value="record.PhoneNumber" For="@(() => record.PhoneNumber)" Label="Email" />
+                <MudTextField @bind-Value="record.StreetAddress" For="@(() => record.StreetAddress)" Label="Street Address" />
+                <MudTextField @bind-Value="record.City" For="@(() => record.City)" Label="City" />
+                <MudTextField @bind-Value="record.State" For="@(() => record.State)" Label="State" />
+                <MudTextField @bind-Value="record.Zip" For="@(() => record.Zip)" Label="Zip" />
+            </DialogContent>
+            <DialogActions>
+                <MudButton OnClick="OnCancel">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Update</MudButton>
+            </DialogActions>
+        </MudDialog>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [CascadingParameter]
+    MudDialogInstance? MudDialog { get; set; }
+
+    private Contact? record;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            record = await AppService.GetContactByIdAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void OnCancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private async void OnSubmit()
+    {
+        if (record == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await AppService.UpdateContactAsync(Id, record);
+            MudDialog?.Close();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+}
