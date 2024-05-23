@@ -1,5 +1,6 @@
-using ContactsWebClientMudBlazor.Authentication;
 using ContactsWebClientMudBlazor.Services;
+using Blazored.LocalStorage;
+using ContactsWebClientMudBlazor.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
@@ -20,5 +21,10 @@ public static class Extensions
         services
             .AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
         
+    }
+    public static void AddBrowserStorageService(this IServiceCollection services)
+    {
+        services.AddBlazoredLocalStorage();
+        services.AddScoped<IStorageService, BrowserStorageService>();
     }
 }
