@@ -68,7 +68,7 @@ else
     {
         try
         {
-            PagedResultDto<User> res = await AppService.ListContactUsersAsync();
+            PagedResultDto<User> res = await AppService.ListContactUsersAsync("",0,0);
             users = res.Items.ToArray();
         }
         catch (Exception ex)
@@ -81,10 +81,24 @@ else
     {
         var top = state.PageSize;
         var skip = state.Page * state.PageSize;
+        string? orderby = "";
+        string? filter = null;
+        bool count = true;
+        string? expand = null;
         var RecordCount = 0;
+
+        if (state.SortDefinitions.Any())
+        {
+            var firstSortDefinition = state.SortDefinitions.First();
+            var direction = firstSortDefinition.Descending;
+            if (direction)
+                orderby = firstSortDefinition.SortBy + " desc";
+            else
+                orderby = firstSortDefinition.SortBy;
+        }
         try
         {
-            PagedResultDto<User> res = await AppService.ListContactUsersAsync();
+            PagedResultDto<User> res = await AppService.ListContactUsersAsync(orderby, skip, top);
             users = res.Items.ToArray();
             RecordCount = (int)res.TotalCount;
         }

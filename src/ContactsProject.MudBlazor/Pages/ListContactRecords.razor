@@ -88,7 +88,7 @@ else
     {
         try
         {
-            PagedResultDto<Contact> res = await AppService.ListContactsAsync();
+            PagedResultDto<Contact> res = await AppService.ListContactsAsync("", 0, 0);
             records = res.Items.ToArray();
         }
         catch (Exception ex)
@@ -102,10 +102,26 @@ else
     {
         var top = state.PageSize;
         var skip = state.Page * state.PageSize;
+        string? orderby = "";
+        string? filter = null;
+        bool count = true;
+        string? expand = null;
         var RecordCount = 0;
+
+        if (state.SortDefinitions.Any())
+        {
+            var firstSortDefinition = state.SortDefinitions.First();
+            var direction = firstSortDefinition.Descending;
+            if (direction)
+                orderby = firstSortDefinition.SortBy + " desc";
+            else
+                orderby = firstSortDefinition.SortBy;
+        }
+        
         try
         {
-            PagedResultDto<Contact> res = await AppService.ListContactsAsync();
+            PagedResultDto<Contact> res = await AppService.ListContactsAsync(orderby, skip, top);
+            
             records = res.Items.ToArray();
             RecordCount = (int)res.TotalCount;
         }

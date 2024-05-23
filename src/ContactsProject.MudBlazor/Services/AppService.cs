@@ -3,6 +3,8 @@ using ContactsWebClientMudBlazor.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using System.Web;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ContactsWebClientMudBlazor.Services;
@@ -49,12 +51,20 @@ public class AppService
         await HandleResponseErrorsAsync(response);
     }
 
-    public async Task<PagedResultDto<User>> ListContactUsersAsync()
+    public async Task<PagedResultDto<User>> ListContactUsersAsync(string orderby, int skip, int top)
     {
         string token = authenticationStateProvider.Token
             ?? throw new Exception("Not authorized");
 
-        HttpRequestMessage request = new(HttpMethod.Get, "api/identity/users");
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        string uri = $"api/identity/users";
+        if (!string.IsNullOrEmpty(orderby))
+        {
+            queryString.Add("Sorting", orderby);
+            uri = uri + "?" + queryString;
+        }
+
+        HttpRequestMessage request = new(HttpMethod.Get, uri);
         request.Headers.Add("Authorization", $"Bearer {token}");
 
         HttpResponseMessage response = await httpClient.SendAsync(request);
@@ -106,12 +116,20 @@ public class AppService
         await HandleResponseErrorsAsync(response);
     }
 
-    public async Task<PagedResultDto<Contact>> ListContactsAsync()
+    public async Task<PagedResultDto<Contact>> ListContactsAsync(string orderby, int skip, int top)
     {
         string token = authenticationStateProvider.Token
             ?? throw new Exception("Not authorized");
 
-        HttpRequestMessage request = new(HttpMethod.Get, "api/app/contact");
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        string uri = $"api/app/contact";
+        if (!string.IsNullOrEmpty(orderby))
+        {
+            queryString.Add("Sorting", orderby);
+            uri = uri + "?"+queryString;
+        }
+        
+        HttpRequestMessage request = new(HttpMethod.Get, uri);
         request.Headers.Add("Authorization", $"Bearer {token}");
 
         HttpResponseMessage response = await httpClient.SendAsync(request);
@@ -120,7 +138,7 @@ public class AppService
 
         return await response.Content.ReadFromJsonAsync<PagedResultDto<Contact>>();
     }
-
+        
     public async Task<Contact?> GetContactByIdAsync(long id)
     {
         string token = authenticationStateProvider.Token
