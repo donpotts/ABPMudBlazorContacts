@@ -88,7 +88,7 @@ else
     {
         try
         {
-            PagedResultDto<Contact> res = await AppService.ListContactsAsync("", 0, 0);
+            PagedResultDto<Contact> res = await AppService.ListContactsAsync("", 0, null);
             records = res.Items.ToArray();
         }
         catch (Exception ex)
@@ -103,9 +103,6 @@ else
         var top = state.PageSize;
         var skip = state.Page * state.PageSize;
         string? orderby = "";
-        string? filter = null;
-        bool count = true;
-        string? expand = null;
         var RecordCount = 0;
 
         if (state.SortDefinitions.Any())

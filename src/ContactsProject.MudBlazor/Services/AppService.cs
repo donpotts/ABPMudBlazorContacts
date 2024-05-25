@@ -1,6 +1,7 @@
 using ContactsWebClientMudBlazor.Authentication;
 using ContactsWebClientMudBlazor.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -51,18 +52,13 @@ public class AppService
         await HandleResponseErrorsAsync(response);
     }
 
-    public async Task<PagedResultDto<User>> ListContactUsersAsync(string orderby, int skip, int top)
+    public async Task<PagedResultDto<User>> ListContactUsersAsync(string orderby, int skip, int? top)
     {
         string token = authenticationStateProvider.Token
             ?? throw new Exception("Not authorized");
 
-        var queryString = HttpUtility.ParseQueryString(string.Empty);
-        string uri = $"api/identity/users";
-        if (!string.IsNullOrEmpty(orderby))
-        {
-            queryString.Add("Sorting", orderby);
-            uri = uri + "?" + queryString;
-        }
+        Uri uri = new(httpClient.BaseAddress, "api/identity/users");
+        uri = GetUri(uri, top, skip, orderby);
 
         HttpRequestMessage request = new(HttpMethod.Get, uri);
         request.Headers.Add("Authorization", $"Bearer {token}");
@@ -116,18 +112,13 @@ public class AppService
         await HandleResponseErrorsAsync(response);
     }
 
-    public async Task<PagedResultDto<Contact>> ListContactsAsync(string orderby, int skip, int top)
+    public async Task<PagedResultDto<Contact>> ListContactsAsync(string orderby, int skip, int? top)
     {
         string token = authenticationStateProvider.Token
             ?? throw new Exception("Not authorized");
 
-        var queryString = HttpUtility.ParseQueryString(string.Empty);
-        string uri = $"api/app/contact";
-        if (!string.IsNullOrEmpty(orderby))
-        {
-            queryString.Add("Sorting", orderby);
-            uri = uri + "?"+queryString;
-        }
+        Uri uri = new(httpClient.BaseAddress, "api/app/contact");
+        uri = GetUri(uri, top, skip, orderby);
         
         HttpRequestMessage request = new(HttpMethod.Get, uri);
         request.Headers.Add("Authorization", $"Bearer {token}");
@@ -196,5 +187,29 @@ public class AppService
         HttpResponseMessage response = await httpClient.SendAsync(request);
 
         await HandleResponseErrorsAsync(response);
+    }
+
+    public Uri GetUri(Uri uri, int? top = null, int? skip = null, string orderby = null)
+    {
+        UriBuilder uriBuilder = new UriBuilder(uri);
+        NameValueCollection nameValueCollection = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+        if (top.HasValue)
+        {
+            nameValueCollection["MaxResultCount"] = $"{top}";
+        }
+
+        if (skip.HasValue)
+        {
+            nameValueCollection["SkipCount"] = $"{skip}";
+        }
+
+        if (!string.IsNullOrEmpty(orderby))
+        {
+            nameValueCollection["Sorting"] = orderby ?? "";
+        }
+
+        uriBuilder.Query = nameValueCollection.ToString();
+        return uriBuilder.Uri;
     }
 }
